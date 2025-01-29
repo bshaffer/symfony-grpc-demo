@@ -11,10 +11,8 @@ class ErrorController
     public function show(Throwable $exception, LoggerInterface $logger)
     {
         return new JsonResponse(
-            [
-                'message' => $exception->getMessage()
-            ],
-            $exception->getCode()
+            ['message' => $exception->getMessage()],
+            $exception->getCode() ?: 500
         );
     }
 }

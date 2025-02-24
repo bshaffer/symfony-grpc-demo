@@ -29,8 +29,8 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onKernelResponse(ResponseEvent $event): void
-    {
+    // public function onKernelResponse(ResponseEvent $event): void
+    // {
         // $response = $event->getResponse();
 
         // $event->setResponse(new Response(
@@ -38,7 +38,7 @@ class TokenSubscriber implements EventSubscriberInterface
         //     Response::HTTP_OK,
         //     ['content-type' => 'application/json']
         // ));
-    }
+    // }
 
     public function onKernelView(ViewEvent $event): void
     {

@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use GRPC\Pinger\PingerInterface;
 use GRPC\Pinger\PingRequest;
 use GRPC\Pinger\PingResponse;
-use GRPC\PingClient;
+use GRPC\Pinger\PingerGrpcClient;
 use Spiral\RoadRunner\GRPC\ContextInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -20,12 +20,12 @@ use GuzzleHttp\ClientInterface;
 class PingerController implements PingerInterface
 {
     private int $count = 100;
-    private PingClient $grpcClient;
+    private PingerGrpcClient $grpcClient;
 
     public function __construct(
         private readonly ClientInterface $httpClient = new Client(),
     ) {
-        $this->grpcClient = new PingClient('127.0.0.1:9999', [
+        $this->grpcClient = new PingerGrpcClient('127.0.0.1:9999', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
     }
@@ -69,7 +69,14 @@ class PingerController implements PingerInterface
 
     private function doRestPing(): int
     {
-        $httpResponse = $this->httpClient->request('GET', 'http://localhost:8080/ping');
+        $message = new PingRequest();
+        $httpResponse = $this->httpClient->request(
+            'POST',
+            'http://localhost:8080/ping',
+            [
+                'body' => $message->serializeToJsonString(),
+            ]
+        );
         return $httpResponse->getStatusCode();
     }
 

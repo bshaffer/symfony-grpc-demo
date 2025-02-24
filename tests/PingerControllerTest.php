@@ -7,7 +7,7 @@ use App\ValueResolver\ContextResolver;
 use App\ValueResolver\ProtobufMessageResolver;
 use GRPC\Pinger\PingRequest;
 use GRPC\Pinger\PingResponse;
-use GRPC\PingClient;
+use GRPC\Pinger\PingerGrpcClient;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -28,7 +28,7 @@ class PingerControllerTest extends TestCase
     protected function setUp(): void
     {
         $this->httpClient = $this->prophesize(ClientInterface::class);
-        $this->grpcClient = $this->prophesize(PingClient::class);
+        $this->grpcClient = $this->prophesize(PingerGrpcClient::class);
         $this->controller = new PingerController($this->httpClient->reveal());
         $reflection = new \ReflectionProperty($this->controller, 'grpcClient');
         $reflection->setAccessible(true);

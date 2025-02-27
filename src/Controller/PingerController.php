@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\ValueResolver\ContextResolver;
 use App\ValueResolver\ProtobufMessageResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use GRPC\Pinger\PingerInterface;
@@ -19,8 +19,6 @@ use GuzzleHttp\ClientInterface;
 
 class PingerController implements PingerInterface
 {
-    // @TODO: Make this a querystring parameter
-    private int $count = 1;
     private PingerGrpcClient $grpcClient;
 
     public function __construct(
@@ -29,16 +27,6 @@ class PingerController implements PingerInterface
         $this->grpcClient = new PingerGrpcClient('127.0.0.1:9999', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
-    }
-
-    #[Route('/lucky/number')]
-    public function number(): Response
-    {
-        $number = random_int(0, 100);
-
-        return new Response(
-            '<html><body>Lucky number: '.$number.'</body></html>'
-        );
     }
 
     #[Route('/ping')]
@@ -54,11 +42,12 @@ class PingerController implements PingerInterface
     }
 
     #[Route('/ping/rest')]
-    public function restPing()
-    {
+    public function restPing(
+        #[MapQueryParameter] int $count = 1
+    ) {
         $statusCodes = [];
-        for ($i = 0; $i < $this->count; $i++) {
-            $statusCodes = $this->httpClient->request('POST', 'http://localhost:8080/ping')->getStatusCode();
+        for ($i = 0; $i < $count; $i++) {
+            $statusCodes[] = $this->doRestPing();
         }
 
         return new JsonResponse(['REST Ping status codes' => $statusCodes]);
@@ -78,10 +67,12 @@ class PingerController implements PingerInterface
     }
 
     #[Route('/ping/grpc')]
-    public function grpcPing()
+    public function grpcPing(
+        #[MapQueryParameter] int $count = 1
+    )
     {
         $statusCodes = [];
-        for ($i = 0; $i < $this->count; $i++) {
+        for ($i = 0; $i < $count; $i++) {
             $statusCodes[] = $this->doGrpcPing();
         }
 

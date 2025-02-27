@@ -19,7 +19,8 @@ use GuzzleHttp\ClientInterface;
 
 class PingerController implements PingerInterface
 {
-    private int $count = 100;
+    // @TODO: Make this a querystring parameter
+    private int $count = 1;
     private PingerGrpcClient $grpcClient;
 
     public function __construct(
@@ -47,8 +48,6 @@ class PingerController implements PingerInterface
         #[ValueResolver(ProtobufMessageResolver::class)]
         PingRequest $in
     ): PingResponse {
-        // $httpResponse = $this->httpClient->request('GET', $in->getUrl());
-        // $statusCode = $httpResponse->getStatusCode();
         $statusCode = 200;
 
         return new PingResponse(['status_code' => $statusCode]);
@@ -59,12 +58,10 @@ class PingerController implements PingerInterface
     {
         $statusCodes = [];
         for ($i = 0; $i < $this->count; $i++) {
-            $statusCodes[] = $this->doRestPing();
+            $statusCodes = $this->httpClient->request('POST', 'http://localhost:8080/ping')->getStatusCode();
         }
 
-        return new JsonResponse([
-            'REST Ping status codes' => $statusCodes,
-        ]);
+        return new JsonResponse(['REST Ping status codes' => $statusCodes]);
     }
 
     private function doRestPing(): int
@@ -93,11 +90,11 @@ class PingerController implements PingerInterface
         ]);
     }
 
-    private function doGrpcPing(): int
+    private function doGrpcPing(): int|null
     {
         $message = new PingRequest();
         [$response, $status] = $this->grpcClient->Ping($message)->wait();
 
-        return $response?->getStatusCode() ?? 0;
+        return $response?->getStatusCode() ?? null;
     }
 }

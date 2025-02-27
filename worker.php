@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Sample GRPC PHP server.
+ * RoadRunner PHP server for gRPC and REST.
  */
 
 use GRPC\Pinger\PingerInterface;
@@ -10,12 +10,19 @@ use Spiral\RoadRunner\GRPC\Invoker;
 use Spiral\RoadRunner\GRPC\Server;
 use Spiral\RoadRunner\Worker;
 
-require __DIR__ . '/vendor/autoload.php';
+switch (getenv('RR_MODE')) {
+    case 'http':
+        return require __DIR__ . '/public/index.php';
+    case 'grpc':
+        require __DIR__ . '/vendor/autoload.php';
+        $worker = Worker::create();
+        $server = new Server(new Invoker(), [
+            'debug' => true, // optional (default: false)
+        ]);
 
-$server = new Server(new Invoker(), [
-    'debug' => true, // optional (default: false)
-]);
+        $server->registerService(PingerInterface::class, new PingerController());
 
-$server->registerService(PingerInterface::class, new PingerController());
-
-$server->serve(Worker::create());
+        $server->serve($worker);
+    default:
+        throw new \Exception(sprintf('Invalid RR_MODE "^%s"', getenv('RR_MODE')));
+}

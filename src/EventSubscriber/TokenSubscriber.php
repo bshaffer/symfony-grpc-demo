@@ -15,19 +15,20 @@ use GRPC\Pinger\PingerInterface;
 
 class TokenSubscriber implements EventSubscriberInterface
 {
-    public function onKernelController(ControllerEvent $event): void
-    {
-        $controller = $event->getController();
+    // public function onKernelController(ControllerEvent $event): void
+    // {
+    //     $controller = $event->getController();
 
-        // when a controller class defines multiple action methods, the controller
-        // is returned as [$controllerInstance, 'methodName']
-        if (is_array($controller)) {
-            $controller = $controller[0];
-        }
+    //     // when a controller class defines multiple action methods, the controller
+    //     // is returned as [$controllerInstance, 'methodName']
+    //     if (is_array($controller)) {
+    //         $controller = $controller[0];
+    //     }
 
-        if ($controller instanceof PingerInterface) {
-        }
-    }
+    //     if ($controller instanceof PingerInterface) {
+    //         // Do something special for the PingerInterface
+    //     }
+    // }
 
     // public function onKernelResponse(ResponseEvent $event): void
     // {

@@ -6,7 +6,9 @@ option php_metadata_namespace = "GRPC\\GPBMetadata";
 package pinger;
 
 service Pinger {
-  rpc ping (PingRequest) returns (PingResponse) {}
+  rpc ping (PingRequest) returns (PingResponse) {
+    // option(http.url) = "/ping";
+  }
 }
 
 message PingRequest {

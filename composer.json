@@ -6,6 +6,7 @@
     "require": {
         "php": ">=8.1",
         "ext-ctype": "*",
+        "ext-grpc": "*",
         "ext-iconv": "*",
         "grpc/grpc": "^1.57",
         "guzzlehttp/guzzle": "^7.9",

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option php_namespace = "GRPC\\AiChat";
+option php_metadata_namespace = "GRPC\\GPBMetadata";
+
+package aichat;
+
+service AiChat {
+  rpc generate (GenerateRequest) returns (stream GenerateResponse) {
+  }
+}
+
+message GenerateRequest {
+  string message = 1;
+  string model = 2;
+}
+
+message GenerateResponse {
+  string response = 1;
+}

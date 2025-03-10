@@ -7,7 +7,6 @@ package pinger;
 
 service Pinger {
   rpc ping (PingRequest) returns (PingResponse) {
-    // option(http.url) = "/ping";
   }
 }
 

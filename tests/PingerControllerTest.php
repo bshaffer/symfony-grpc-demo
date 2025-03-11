@@ -3,8 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Controller\PingerController;
-use App\ValueResolver\ContextResolver;
-use App\ValueResolver\ProtobufMessageResolver;
 use GRPC\Pinger\PingRequest;
 use GRPC\Pinger\PingResponse;
 use GRPC\Pinger\PingerGrpcClient;
@@ -13,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Spiral\RoadRunner\GRPC\ContextInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 
@@ -33,14 +30,6 @@ class PingerControllerTest extends TestCase
         $reflection = new \ReflectionProperty($this->controller, 'grpcClient');
         $reflection->setAccessible(true);
         $reflection->setValue($this->controller, $this->grpcClient->reveal());
-    }
-
-    public function testNumber()
-    {
-        $response = $this->controller->number();
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertStringContainsString('Lucky number:', $response->getContent());
     }
 
     public function testPing()

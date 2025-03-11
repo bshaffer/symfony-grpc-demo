@@ -24,7 +24,7 @@ class PingerController implements PingerInterface
     public function __construct(
         private readonly ClientInterface $httpClient = new Client(),
     ) {
-        $this->grpcClient = new PingerGrpcClient('127.0.0.1:9999', [
+        $this->grpcClient = new PingerGrpcClient('mysymfonyapi.com:8080', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
     }
@@ -58,7 +58,7 @@ class PingerController implements PingerInterface
         $message = new PingRequest();
         $httpResponse = $this->httpClient->request(
             'POST',
-            'http://localhost:8080/ping',
+            'http://mysymfonyapi.com:8080/ping',
             [
                 'body' => $message->serializeToJsonString(),
             ]

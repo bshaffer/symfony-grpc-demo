@@ -18,3 +18,7 @@ composer.lock
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+
+### Python
+__pycache__

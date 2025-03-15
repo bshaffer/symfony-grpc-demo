@@ -9,11 +9,6 @@ composer.lock
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
-
-###> league/oauth2-server-bundle ###
-/config/jwt/*.pem
-###< league/oauth2-server-bundle ###
-
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
@@ -22,3 +17,4 @@ composer.lock
 
 ### Python
 __pycache__
+rr

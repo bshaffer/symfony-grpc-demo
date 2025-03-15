@@ -73,7 +73,7 @@ function generateClientCode(string $packageName, string $className, string $name
         $methods[] = <<<PHP
             public function $methodName($inputType \$request): $outputType
             {
-                return \$this->call('$methodName', \$request);
+                return \$this->call('$methodName', \$request, $outputType::class);
             }\n
         PHP;
     }
@@ -99,19 +99,21 @@ class {$className}
         ]);
     }
 
-    private function call(\$method, \$request)
+    private function call(\$method, \$request, \$responseClass)
     {
         // Implement the gRPC call here
         if (\$this->transport === 'grpc') {
             [\$response, \$status] = \$this->grpcClient->\$method(\$request)->wait();
         } else {
-            return \$this->httpClient->request(
+            \$httpResponse = \$this->httpClient->request(
                 'POST',
                 \$this->host . '/' . \$method,
                 [
                     'body' => \$request->serializeToJsonString(),
                 ]
             );
+            \$response = new \$responseClass();
+            \$response->mergeFromJsonString(\$httpResponse->getBody()->getContents());
         }
 
         return \$response;

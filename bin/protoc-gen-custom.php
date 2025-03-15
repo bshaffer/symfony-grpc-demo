@@ -49,7 +49,7 @@ function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResp
 
         // Create a new file in the response
         $generatedFile = new CodeGeneratorResponse\File();
-        $generatedFile->setName(str_replace('\\', '/', $namespace) . '/' . $className . '.php');
+        $generatedFile->setName(str_replace('\\', '/', $namespace) . '/' . $className . 'Client.php');
         $generatedFile->setContent($classContent);
         $files[] = $generatedFile;
     }
@@ -81,9 +81,10 @@ function generateClientCode(string $packageName, string $className, string $name
 
     $code = <<<PHP
 <?php
+# GENERATED CODE -- DO NOT EDIT!
 namespace {$namespace};
 
-class {$className}
+class {$className}Client
 {
     private \Grpc\BaseStub \$grpcClient;
     private \GuzzleHttp\Client \$httpClient;

@@ -16,7 +16,6 @@ class AiChatServicer(aichat_pb2_grpc.AiChatServicer):
         inputs = tokenizer(request.message, return_tensors="pt")
 
         generation_kwargs = dict(inputs, streamer=streamer, max_new_tokens=1024, no_repeat_ngram_size=True) #adjust max_new_tokens as needed.
-        # generation_kwargs = dict(inputs, streamer=streamer) #adjust max_new_tokens as needed.
 
         def generate_and_stream():
             model.generate(**generation_kwargs)

@@ -25,7 +25,7 @@ class AiGenerateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $client = new AiChatGrpcClient('localhost:50051', [
-            'credentials' => new \Grpc\ChannelCredentials(),
+            'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
 
         $message = $input->getArgument('message');
@@ -33,9 +33,12 @@ class AiGenerateCommand extends Command
         $request = new GenerateRequest();
         $request->setMessage($message);
 
-        $call = $client->generate($request);
+        $streamingCall = $client->generate($request);
 
-        foreach ($call->responses() as $response) {
+        $responses = $streamingCall->responses();
+
+        $output->writeln('<info>Responses from gRPC server:</info>');
+        foreach ($responses as $response) {
             $output->write($response->getResponse());
         }
 

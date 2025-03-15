@@ -5,6 +5,17 @@ rpc:
 
 http:
   address: 0.0.0.0:8888
+  middleware: [ "static" ] # <-- Add static to the list of the middleware
+  static:
+    dir: "./public/build"
+    forbid: [ "" ]
+    calculate_etag: false
+    weak: false
+    allow: []
+    request:
+      input: "custom-header"
+    response:
+      output: "output-header"
 
 server:
   command: "php worker.php"

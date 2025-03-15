@@ -3,8 +3,9 @@
 ## install dependencies
 
 ```
+pip install grpcio grpcio-tools
 pip install transformers
-pip install torch torchvision
+torch
 ```
 
 ## run the server

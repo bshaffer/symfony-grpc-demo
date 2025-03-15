@@ -22,3 +22,14 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Define ChannelCredentials service
+    grpc.channel.credentials.insecure:
+        class: Grpc\ChannelCredentials
+        factory: ['Grpc\ChannelCredentials', 'createInsecure']
+
+    GRPC\AiChat\AiChatGrpcClient:
+        arguments:
+            $hostname: 'localhost:50051'
+            $opts:
+                credentials: '@grpc.channel.credentials.insecure'

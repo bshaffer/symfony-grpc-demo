@@ -25,7 +25,8 @@
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
         "symfony/serializer": "6.4.*",
-        "symfony/yaml": "6.4.*"
+        "symfony/yaml": "6.4.*",
+        "twig/twig": "^3.20"
     },
     "config": {
         "allow-plugins": {

@@ -2,38 +2,60 @@
 
 namespace App\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputOption;
 use GRPC\AiChat\AiChatGrpcClient;
-use \Grpc\ChannelCredentials;
 use GRPC\AiChat\GenerateRequest;
 
+#[AsCommand(
+    name: 'ai:generate',
+    description: 'Calls the gRPC streaming API'
+)]
 class AiGenerateCommand extends Command
 {
-    protected static $defaultName = 'ai:generate';
+    private $aiChatClient;
+
+    public function __construct(AiChatGrpcClient $aiChatClient)
+    {
+        parent::__construct();
+        $this->aiChatClient = $aiChatClient;
+    }
 
     protected function configure()
     {
         $this
-            ->setDescription('Calls the gRPC streaming API with a message and streams the response.')
-            ->addArgument('message', InputArgument::REQUIRED, 'The message to send to the API.');
+            ->addOption('message', 'm', InputOption::VALUE_OPTIONAL, 'Message to send to the gRPC server')
+            ->addOption('model', null, InputOption::VALUE_OPTIONAL, 'Model to use for generation', 'gpt2');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $client = new AiChatGrpcClient('localhost:50051', [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure(),
-        ]);
+        $message = $input->getOption('message');
+        $model = $input->getOption('model');
 
-        $message = $input->getArgument('message');
+        if (!$message) {
+            $helper = $this->getHelper('question');
+            $question = new Question('Please enter your message: ');
+            $message = $helper->ask($input, $output, $question);
+
+            if (!$message) {
+                $output->writeln('<error>Message cannot be empty.</error>');
+                return Command::FAILURE;
+            }
+        }
+
+        $output->writeln("<info>Sending message to gRPC server: '$message'</info>");
+        $output->writeln("<info>Using model: '$model'</info>");
 
         $request = new GenerateRequest();
         $request->setMessage($message);
+        $request->setModel($model);
 
-        $streamingCall = $client->generate($request);
+        $streamingCall = $this->aiChatClient->generate($request);
 
         $responses = $streamingCall->responses();
 
@@ -41,8 +63,6 @@ class AiGenerateCommand extends Command
         foreach ($responses as $response) {
             $output->write($response->getResponse());
         }
-
-        $client->close();
 
         return Command::SUCCESS;
     }

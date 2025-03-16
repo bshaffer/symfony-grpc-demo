@@ -6,15 +6,15 @@ const GRPC_PORT = 9999;
 const LISTEN_PORT = 8080;
 
 // Function to detect protocol (basic HTTP check)
-function detectProtocol(data) {
-    return data.toString().startsWith('GET ') || data.toString().startsWith('POST ') ||
-           data.toString().startsWith('HEAD ') || data.toString().startsWith('PUT ');
+function detectHTTP(data) {
+    const prefixes = ["GET ", "POST ", "PUT ", "HEAD ", "OPTIONS ", "DELETE "];
+    return prefixes.some(prefix => data.toString().startsWith(prefix));
 }
 
 // Create multiplexer server
 const server = net.createServer((clientSocket) => {
     clientSocket.once('data', (data) => {
-        let targetPort = detectProtocol(data) ? HTTP_PORT : GRPC_PORT;
+        let targetPort = detectHTTP(data) ? HTTP_PORT : GRPC_PORT;
 
         // Forward connection to the appropriate internal server
         const targetSocket = net.createConnection(targetPort, '127.0.0.1', () => {

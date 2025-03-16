@@ -36,7 +36,8 @@ file_put_contents('php://stdout', $output);
  * @param FileDescriptorProto $fileDescriptor The file descriptor.
  * @param CodeGeneratorResponse $response The response object.
  */
-function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResponse $response) {
+function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResponse $response)
+{
     $fileName = $fileDescriptor->getName();
     $packageName = $fileDescriptor->getPackage();
     $namespace = $fileDescriptor->getOptions()->getPhpNamespace() ?? str_replace('.', '/', $packageName);
@@ -46,7 +47,6 @@ function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResp
     foreach ($fileDescriptor->getService() as $serviceType) {
         $serviceName = $serviceType->getName();
         $className = ucfirst($serviceName); // Basic class name conversion
-
         $classContent = generateClientCode($packageName, $className, $namespace, $serviceType);
 
         // Create a new file in the response
@@ -66,7 +66,12 @@ function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResp
   * @param ServiceDescriptorProto $serviceType
   * @return string The generated PHP code.
   */
-function generateClientCode(string $packageName, string $className, string $namespace, ServiceDescriptorProto $serviceType): string {
+function generateClientCode(
+    string $packageName,
+    string $className,
+    string $namespace,
+    ServiceDescriptorProto $serviceType
+): string {
     $methods = [];
     foreach ($serviceType->getMethod() as $method) {
         $methods[] = [

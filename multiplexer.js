@@ -15,6 +15,7 @@ function detectHTTP(data) {
 const server = net.createServer((clientSocket) => {
     clientSocket.once('data', (data) => {
         let targetPort = detectHTTP(data) ? HTTP_PORT : GRPC_PORT;
+        console.log(`Detected ${detectHTTP(data) ? 'HTTP' : 'gRPC'} protocol, forwarding to port ${targetPort}`);
 
         // Forward connection to the appropriate internal server
         const targetSocket = net.createConnection(targetPort, '127.0.0.1', () => {

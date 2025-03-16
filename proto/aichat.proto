@@ -5,7 +5,7 @@ option php_namespace = "GRPC\\AiChat";
 option php_metadata_namespace = "GRPC\\GPBMetadata";
 
 service AiChat {
-    rpc generate (GenerateRequest) returns (stream GenerateResponse) {
+    rpc generate(GenerateRequest) returns (stream GenerateResponse) {
     }
 }
 

@@ -17,6 +17,13 @@ class {{ className }}Client
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
     }
+    {% for method in methods %}
+
+    public function {{ method.name }}({{ method.request }} $request): {{ method.response }}
+    {
+        return $this->call('{{ method.name }}', $request, {{ method.response }}::class);
+    }
+    {% endfor %}
 
     private function call($method, $request, $responseClass)
     {
@@ -40,11 +47,4 @@ class {{ className }}Client
 
         return $response;
     }
-    {% for method in methods %}
-
-    public function {{ method.name }}({{ method.request }} $request): {{ method.response }}
-    {
-        return $this->call('{{ method.name }}', $request, {{ method.response }}::class);
-    }
-    {% endfor %}
 }

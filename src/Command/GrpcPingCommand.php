@@ -21,10 +21,8 @@ class GrpcPingCommand extends Command
             ->addArgument('host', InputArgument::REQUIRED, 'The hostname to use for the grpc client');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<info>Connecting to Pinger gRPC service at localhost:9999...</info>');
-
         $host = $input->getArgument('host');
         $client = new PingerGrpcClient($host, [
             'credentials' => ChannelCredentials::createInsecure(),

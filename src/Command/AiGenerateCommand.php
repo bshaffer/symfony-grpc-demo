@@ -32,7 +32,7 @@ class AiGenerateCommand extends Command
             ->addOption('model', null, InputOption::VALUE_OPTIONAL, 'Model to use for generation', 'gpt2');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $message = $input->getOption('message');
         $model = $input->getOption('model');

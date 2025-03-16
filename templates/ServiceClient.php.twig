@@ -23,6 +23,9 @@ class {{ className }}Client
         // Implement the gRPC call here
         if ($this->transport === 'grpc') {
             [$response, $status] = $this->grpcClient->$method($request)->wait();
+            if (!$response) {
+                throw new \Exception('gRPC call failed: ' . $status->details);
+            }
         } else {
             $httpResponse = $this->httpClient->request(
                 'POST',

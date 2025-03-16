@@ -80,7 +80,7 @@ function generateClientCode(
             'response' => ltrim(str_replace($packageName, '', $method->getOutputType()), '.'),
         ];
     }
-    $loader = new FilesystemLoader(__DIR__ . '/../templates/apiclient');
+    $loader = new FilesystemLoader(__DIR__ . '/../templates');
     return (new Environment($loader))->render('ServiceClient.php.twig', [
         'namespace' => $namespace,
         'className' => $className,

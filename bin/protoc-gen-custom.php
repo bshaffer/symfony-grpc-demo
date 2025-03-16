@@ -8,6 +8,8 @@ use Google\Protobuf\Compiler\CodeGeneratorRequest;
 use Google\Protobuf\Compiler\CodeGeneratorResponse;
 use Google\Protobuf\Internal\FileDescriptorProto;
 use Google\Protobuf\Internal\ServiceDescriptorProto;
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 
 // Read the CodeGeneratorRequest from stdin
 $input = file_get_contents('php://stdin');
@@ -67,61 +69,17 @@ function processProtoFile(FileDescriptorProto $fileDescriptor, CodeGeneratorResp
 function generateClientCode(string $packageName, string $className, string $namespace, ServiceDescriptorProto $serviceType): string {
     $methods = [];
     foreach ($serviceType->getMethod() as $method) {
-        $inputType = ltrim(str_replace($packageName, '', $method->getInputType()), '.');
-        $outputType = ltrim(str_replace($packageName, '', $method->getOutputType()), '.');
-        $methodName = $method->getName();
-        $methods[] = <<<PHP
-            public function $methodName($inputType \$request): $outputType
-            {
-                return \$this->call('$methodName', \$request, $outputType::class);
-            }\n
-        PHP;
+        $methods[] = [
+            'name' => $method->getName(),
+            'request' => ltrim(str_replace($packageName, '', $method->getInputType()), '.'),
+            'response' => ltrim(str_replace($packageName, '', $method->getOutputType()), '.'),
+        ];
     }
-    $methodsCode = implode("\n", $methods);
-
-    $code = <<<PHP
-<?php
-# GENERATED CODE -- DO NOT EDIT!
-namespace {$namespace};
-
-class {$className}Client
-{
-    private \Grpc\BaseStub \$grpcClient;
-    private \GuzzleHttp\Client \$httpClient;
-    private string \$transport = 'grpc';
-    private string \$host = 'mysymfonyapi.com:8080';
-
-    public function __construct(array \$options = [])
-    {
-        \$this->transport = \$options['transport'] ?? 'grpc';
-        \$this->httpClient = \$options['httpClient'] ?? new \GuzzleHttp\Client();
-        \$this->grpcClient = \$options['grpcClient'] ?? new {$className}GrpcClient(\$this->host, [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure(),
-        ]);
-    }
-
-    private function call(\$method, \$request, \$responseClass)
-    {
-        // Implement the gRPC call here
-        if (\$this->transport === 'grpc') {
-            [\$response, \$status] = \$this->grpcClient->\$method(\$request)->wait();
-        } else {
-            \$httpResponse = \$this->httpClient->request(
-                'POST',
-                \$this->host . '/' . \$method,
-                [
-                    'body' => \$request->serializeToJsonString(),
-                ]
-            );
-            \$response = new \$responseClass();
-            \$response->mergeFromJsonString(\$httpResponse->getBody()->getContents());
-        }
-
-        return \$response;
-    }
-
-{$methodsCode}
-}
-PHP;
-    return $code;
+    $loader = new FilesystemLoader(__DIR__ . '/../templates/apiclient');
+    return (new Environment($loader))->render('ServiceClient.php.twig', [
+        'namespace' => $namespace,
+        'className' => $className,
+        'host' => 'mysymfonyapi.com:8080',
+        'methods' => $methods,
+    ]);
 }

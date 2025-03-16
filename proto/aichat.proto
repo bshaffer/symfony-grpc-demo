@@ -6,15 +6,15 @@ option php_metadata_namespace = "GRPC\\GPBMetadata";
 package aichat;
 
 service AiChat {
-  rpc generate (GenerateRequest) returns (stream GenerateResponse) {
-  }
+    rpc generate (GenerateRequest) returns (stream GenerateResponse) {
+    }
 }
 
 message GenerateRequest {
-  string message = 1;
-  string model = 2;
+    string message = 1;
+    string model = 2;
 }
 
 message GenerateResponse {
-  string response = 1;
+    string response = 1;
 }

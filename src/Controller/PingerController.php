@@ -20,11 +20,12 @@ use GuzzleHttp\ClientInterface;
 class PingerController implements PingerInterface
 {
     private PingerGrpcClient $grpcClient;
+    private string $hostname = 'mysymfonyapi.com:8080';
 
     public function __construct(
         private readonly ClientInterface $httpClient = new Client(),
     ) {
-        $this->grpcClient = new PingerGrpcClient('mysymfonyapi.com:8080', [
+        $this->grpcClient = new PingerGrpcClient($this->hostname, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
     }
@@ -47,23 +48,14 @@ class PingerController implements PingerInterface
     ) {
         $statusCodes = [];
         for ($i = 0; $i < $count; $i++) {
-            $statusCodes[] = $this->doRestPing();
+            $message = new PingRequest();
+            $httpResponse = $this->httpClient->post($this->hostname . '/ping', [
+                'body' => $message->serializeToJsonString(),
+            ]);
+            $statusCodes[] = $httpResponse->getStatusCode();
         }
 
         return new JsonResponse(['REST Ping status codes' => $statusCodes]);
-    }
-
-    private function doRestPing(): int
-    {
-        $message = new PingRequest();
-        $httpResponse = $this->httpClient->request(
-            'POST',
-            'http://mysymfonyapi.com:8080/ping',
-            [
-                'body' => $message->serializeToJsonString(),
-            ]
-        );
-        return $httpResponse->getStatusCode();
     }
 
     #[Route('/ping/grpc')]
@@ -73,19 +65,14 @@ class PingerController implements PingerInterface
     {
         $statusCodes = [];
         for ($i = 0; $i < $count; $i++) {
-            $statusCodes[] = $this->doGrpcPing();
+            $message = new PingRequest();
+            [$response, $status] = $this->grpcClient->Ping($message)->wait();
+
+            $statusCodes[] = $response?->getStatusCode() ?? null;
         }
 
         return new JsonResponse([
             'GRPC Ping status codes' => $statusCodes,
         ]);
-    }
-
-    private function doGrpcPing(): int|null
-    {
-        $message = new PingRequest();
-        [$response, $status] = $this->grpcClient->Ping($message)->wait();
-
-        return $response?->getStatusCode() ?? null;
     }
 }

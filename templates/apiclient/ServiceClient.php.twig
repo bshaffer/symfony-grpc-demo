@@ -1,0 +1,47 @@
+<?php
+# GENERATED CODE -- DO NOT EDIT!
+namespace {{ namespace }};
+
+class {{ className }}Client
+{
+    private \Grpc\BaseStub $grpcClient;
+    private \GuzzleHttp\Client $httpClient;
+    private string $transport = 'grpc';
+    private string $host = '{{ host }}';
+
+    public function __construct(array $options = [])
+    {
+        $this->transport = $options['transport'] ?? 'grpc';
+        $this->httpClient = $options['httpClient'] ?? new \GuzzleHttp\Client();
+        $this->grpcClient = $options['grpcClient'] ?? new {{ className }}GrpcClient($this->host, [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure(),
+        ]);
+    }
+
+    private function call($method, $request, $responseClass)
+    {
+        // Implement the gRPC call here
+        if ($this->transport === 'grpc') {
+            [$response, $status] = $this->grpcClient->$method($request)->wait();
+        } else {
+            $httpResponse = $this->httpClient->request(
+                'POST',
+                $this->host . '/' . $method,
+                [
+                    'body' => $request->serializeToJsonString(),
+                ]
+            );
+            $response = new $responseClass();
+            $response->mergeFromJsonString($httpResponse->getBody()->getContents());
+        }
+
+        return $response;
+    }
+    {% for method in methods %}
+
+    public function {{ method.name }}({{ method.request }} $request): {{ method.response }}
+    {
+        return $this->call('{{ method.name }}', $request, {{ method.response }}::class);
+    }
+    {% endfor %}
+}

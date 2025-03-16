@@ -14,6 +14,9 @@ composer.lock
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
+### Ignore generated client directory (for demo purposes)
+generated-client
+
 
 ### Python
 __pycache__
